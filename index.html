@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسابداری لوکس بوتل</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-blue: #00d2ff;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: #0f0c29;
+            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 { 
+            font-size: 3em; 
+            margin: 0; 
+            background: linear-gradient(to right, #00d2ff, #39ff14);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0,210,255,0.5));
+        }
+
+        /* استایل کارت شیشه‌ای */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
+            padding-bottom: 150px;
+        }
+
+        .card { 
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+        }
+
+        .card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(0,210,255,0.2);
+        }
+
+        .name { font-size: 1.8em; font-weight: bold; margin-bottom: 25px; letter-spacing: 1px; }
+
+        /* کنترلرها */
+        .control-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .label { font-size: 0.8em; color: #aaa; margin-bottom: 10px; display: block; }
+
+        .flex-row { display: flex; align-items: center; justify-content: space-between; }
+
+        .btn {
+            width: 45px; height: 45px; border: none; border-radius: 15px;
+            cursor: pointer; font-size: 1.5em; color: white;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .btn-blue { background: linear-gradient(45deg, #00d2ff, #3a7bd5); }
+        .btn-pink { background: linear-gradient(45deg, #ff007f, #b3065e); }
+        
+        .btn:hover { filter: brightness(1.2); transform: scale(1.1); }
+
+        .value { font-size: 1.6em; font-weight: bold; font-family: 'Courier New', monospace; }
+
+        .profit-display {
+            font-size: 1.2em;
+            color: var(--neon-green);
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 15px;
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        /* نوار ابزار پایین */
+        .bottom-nav {
+            position: fixed;
+            bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            width: 95%; max-width: 900px;
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 25px 40px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .grand-total-label { color: #aaa; font-size: 0.9em; margin-bottom: 5px; }
+        .grand-total-val { font-size: 2.2em; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 15px rgba(57,255,20,0.5); }
+
+        .finish-btn {
+            background: var(--neon-green);
+            color: #000; border: none; 
+            padding: 18px 40px; border-radius: 20px;
+            font-weight: bold; cursor: pointer; font-size: 1.1em;
+        }
+
+        .finish-btn:hover { background: #fff; transform: translateY(-3px); box-shadow: 0 5px 20px var(--neon-green); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>BOTTLE ACCOUNTING</h1>
+        <p>سیستم مدیریت لوکس و هوشمند انبار</p>
+    </div>
+    
+    <div class="grid" id="mainGrid"></div>
+</div>
+
+<div class="bottom-nav">
+    <div>
+        <div class="grand-total-label">مجموع سود خالص امروز</div>
+        <div class="grand-total-val" id="totalProfit">0</div>
+    </div>
+    <button class="finish-btn" onclick="finalize()">ثبت نهایی و پاکسازی</button>
+</div>
+
+<script>
+    let products = [
+        {name:"ستینگ", stock:60, buy:110, sell:130, sold:0},
+        {name:"لیتر", stock:50, buy:60, sell:80, sold:0},
+        {name:"بوستر", stock:40, buy:80, sell:100, sold:0},
+        {name:"پیت", stock:30, buy:150, sell:180, sold:0}
+    ];
+
+    function draw() {
+        const grid = document.getElementById('mainGrid');
+        grid.innerHTML = '';
+
+        products.forEach((p, i) => {
+            const pProfit = (p.sell - p.buy) * p.sold;
+            grid.innerHTML += `
+                <div class="card">
+                    <div class="name">${p.name}</div>
+                    
+                    <div class="control-panel">
+                        <span class="label">📦 موجودی در انبار</span>
+                        <div class="flex-row">
+                            <button class="btn btn-blue" onclick="updateStock(${i},-1)">-</button>
+                            <span class="value">${p.stock}</span>
+                            <button class="btn btn-blue" onclick="updateStock(${i},1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="control-panel">
+                        <span class="label">🛒 تعداد فروش امروز</span>
+                        <div class="flex-row">
+                            <button class="btn btn-pink" onclick="updateSale(${i},-1)">-</button>
+                            <span class="value" style="color:var(--neon-pink)">${p.sold}</span>
+                            <button class="btn btn-pink" onclick="updateSale(${i},1)">+</button>
+                        </div>
+                    </div>
+
+                    <div class="profit-display">
+                        سود: ${pProfit.toLocaleString()} افغانی
+                    </div>
+                </div>
+            `;
+        });
+        calcTotal();
+    }
+
+    function updateStock(i, v) {
+        if(products[i].stock + v >= 0) {
+            products[i].stock += v;
+            draw();
+        }
+    }
+
+    function updateSale(i, v) {
+        const p = products[i];
+        if(p.sold + v >= 0 && p.sold + v <= p.stock) {
+            p.sold += v;
+            draw();
+        }
+    }
+
+    function calcTotal() {
+        let total = products.reduce((s, p) => s + ((p.sell - p.buy) * p.sold), 0);
+        document.getElementById('totalProfit').innerText = total.toLocaleString() + " AF";
+    }
+
+    function finalize() {
+        if(confirm("آیا از بستن لیست امروز اطمینان دارید؟")) {
+            products.forEach(p => {
+                p.stock -= p.sold;
+                p.sold = 0;
+            });
+            draw();
+        }
+    }
+
+    draw();
+</script>
+
+</body>
+</html>
